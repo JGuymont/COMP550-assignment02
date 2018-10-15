@@ -39,7 +39,7 @@ test accuracy 	&	0.786	&	0.787	&	0.795	\\
 
 \section*{Question 1}
 
-The set of possible tag is \{N, C, V, J\} and the lexicon is \{that, is, not, it, good\}. The add-1 smoothed initial probabilities are given by
+(a) \textbf{MAP estimate.} The set of possible tag is \{N, C, V, J\} and the lexicon is \{that, is, not, it, good\}. The add-1 smoothed initial probabilities are given by
 \[
 	\pi_i = \frac{count(Q_1=i) + 1}{|sentence| + |corpus|}
 \]
@@ -154,31 +154,61 @@ The MLE of the emissions probability is given by $b_{i,k}=count(O_t=k, Q_t=i)/co
 
 (b) \textbf{Viterbi.} The probability in the first column are given by $P(O_1, Q_1)=P(Q_1)P(O_1|Q_1)=\pi_{Q_1}=\pi_{Q_1}b_{O_1, Q_1}$. For example, the first entry is given by
 \[
-	\delta_N(1) = \pi_N b_{that,~N} = 1/8 \cdot 3/10 = 3/80
+	\delta_N(1) = \pi_N b_{N}(that) = 1/8 \cdot 3/10 = 3/80
 \]
-The value in the second column are given by $\max_i P(Q_{t-1}=i, O_{t-1}) P(Q_t=j|Q_{t-1}=i)P(O_t|Q_t=j)$
+The value in the second column are given by $\max_i P(Q_{t-1}=i, O_{t-1}) P(Q_t=j|Q_{t-1}=i)P(O_t|Q_t=j)=\max_i\delta_i(t-1)a_{ij}b_j(O_t)$. For example, the first entry of the second column is given by
+\begin{equation}
+	\begin{split}
+		\delta_N(2) 
+			=& \max_i \delta_i(1)a_{iN}b_N(is) \\
+			=& \frac{1}{13}\max \{
+				\frac{5}{104}\cdot \frac{3}{10},
+				\frac{9}{56}\cdot \frac{1}{2},
+				\frac{3}{88}\cdot \frac{5}{9},
+				\frac{1}{48}\cdot \frac{1}{4}
+			\}\\
+			=& \frac{5}{809}
+	\end{split}
+\end{equation}
 \begin{table}[h!]
 	\centering
 	\begin{tabular}{ c|c|c|c| }
 		& that & is & good  \\
 		\hline
-		N & 5/104 & 0 & 2 \\
+		N & 5/104 & 9/1456 & 5/6864 \\
 		\hline
-		C & 9/56 & 0 & 0 \\
+		C & 9/56 & 3/784 & 1/3696 \\
 		\hline
-		V & 3/88 & 6 & 0 \\
+		V & 3/88 & 3/176 & 1/2904 \\
 		\hline
-		J & 1/48 & 0 & 0 \\
+		J & 1/48 & 1/224 & 1/1584 \\
 		\hline
 	\end{tabular}
 	\caption{Trellis of the Viterbi algorithm}
 	\label{table:result}
 \end{table}
 
+Thus the most likely tags are:
 
+\[
+	(that, C), (is, V), (good, N)
+\]
 
+(c) \textbf{EM.} First, we reestimate $B$ with add-1 smoothing so the word $bad$ do not have zero probability to occur.
 
+\[
+	B = 
+	\begin{pmatrix}
+		5/14 & 1/14 & 3/14 & 3/14 & 1/14 & 1/14\\
+		3/8 & 1/8 & 1/8 & 1/8 & 1/8 & 1/8 \\
+		1/12 & 7/12 & 1/12 & 1/12 & 1/12 & 1/12\\
+		1/7 & 1/7 & 1/7 & 1/7 & 2/7 & 1/7 \\
+	\end{pmatrix}
+\]
 
+The parameters $\Pi$ and $A$ do not change, since the new examples are completely untaged. The next step is to use viterbi to make prediction on the tags of the new sentence. Then we should use those taged examples to retrain the model.\\
+
+The prediction for the examples (following the same methods as in part b)) are respectively $[(bad, C),  (is, V), (not, N), (good, J)]$ and $[(is, V), (it, N), (bad, V)]$. Now we can add these two tagged examples to the training set and recompute the parameters $\Pi$, $A$, and $B$ just like in part (a).
 
 
 
