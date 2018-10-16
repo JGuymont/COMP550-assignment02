@@ -4,6 +4,8 @@
 \usepackage{graphicx}
 \usepackage{comment}
 
+\newtheorem{definition}{Definition}
+
 \setlength{\parindent}{0pt}
 
 \title{COMP550 Natural Language Processing\\Assignment 2}
@@ -211,9 +213,47 @@ The parameters $\Pi$ and $A$ do not change, since the new examples are completel
 The prediction for the examples (following the same methods as in part b)) are respectively $[(bad, C),  (is, V), (not, N), (good, J)]$ and $[(is, V), (it, N), (bad, V)]$. Now we can add these two tagged examples to the training set and recompute the parameters $\Pi$, $A$, and $B$ just like in part (a).
 
 
+\section*{Question 3}
+\subsection*{1. Brief summary}
+\textbf{Theoritical framework.} The authors develop a novel PCFG approach for parsing part of speech in order to predict POS tags. They focused on improving the features/targets used to train the POS tagger without discussing about the machine learning algorithm. They used an unlexicalized methods (as opposed to lexicalized) and report an accuracy closed to the state of the art, while requiring less memory and being simpler in general. Improving the structure of the targets lead to significant gain in the model prediction, showing that in a task such as POS tagging, the structure of the prediction as a huge role on the performance of the model. \\
+
+\textbf{Experiments.} The part of speech tagger was trained on sections 2-21 of the WSJ section of the Penn treebank. The first 20 files of the section 22 were used as validation set. The section 3 was used as the test set. The authors do not mentioned anything about model specific hyperparameters tuning during the training process, but they tuned features and output structure. For example, the children of S should be NP and VP or NP\^S and VP\^S; features that gives the best accuracy on the validation set are kept. 
+
+\begin{definition} 
+In \textbf{lexicalized PCFG parsing}, the main word of a part of speech ($the head$) is used has an additional feature to predict the tags in a part of speech (POS). The paper does not give examples of methods to infer the head of a POS. The paper does not explain how one could use this additional feature (the head) to make better tag prediction.
+\end{definition}
+
+\begin{definition} Unlexicalized PCFG parsing
+No specification at the lexical level is make. With this approach, features are refined by improving the parsing three. For instance, basic tag like NP can be subcategorized with NP-Pl and NP-Sg. Also, their is often more then one way to split a POS in sub-POS.
+
+\end{definition}
+
+In this case,the  grammar is not systematically specified to the level of lexical items. A standard technique in unlexicalized parsing we compare against is vertical markovization,
+i.e. to refine nonterminals by annotating them with
+their parent (or grandparent). subcategorization of POS categories
+modifying make up of existing tags :\\
+NP [birds] is not allowed\\
+NP-Pl  is fine\\
+
+%therefore no monolexical or bilexical probabilities captured
+%although some might represent a single word.\\
+\subsection*{2. Evaluation and synthesis of what I learned in the paper}
+\textbf{step 1. }They trained their models on a part of $WSJ$ section of the Penn treebank. They used another section (23) for the test set. To parse the grammar, they used an array-based Java implimentation of CKY parser. \\
+\textbf{step2.} Then they introduced series of sparsing techniques which helps them to split the sentences in smaller parts: To use the unlexicalized parsing, the authors used vertical and horizontal Markovization.  The vertical history includes the node itself and parent and grandparent and so on, and in a similar way only the previous horizontal ancestor matter.Then they use the two major annotation strategy which are the External and internal annotation. And the parent annotation is the most important feature of external annotation and influences on internal annotations. Then they used the Unary-DT and Unary-Adv that shows if the adverb and determiner are depended on their parents or not.
+The they used Tag splitting make the POS fined grained. for example parent annotation tag (TAG-PA), which marks all the pre-terminals with their parent category. Also they add -TMP tag on Np's to show that the NP with the S parent can be a temporal NP$\cdots$. They also head annotation, since the head word indicates how the constituent will behave for example if the left most child is a possessive-NP or not. Also using SPLIT-VP the annotated the verb part (VP) by their head tags and bring all finite forms to a single tag VBF, that significantly improved their result for $2.66 \%$ improvement.
+
+\textbf{Advantages:} The model is giving a result as good as lexicalized while it is easy to understand and easy to parse. They introduced methods of parsing that have a big influence on their result and can be used in lexicalized parsers too.\\
+
+\textbf{limitations} They did their training and testing on a corpus probably with a specific subject. So it might not be very efficient for new corpus with different subjects. They have not provided detail for all additional tags and did not give some key parts of their programming part.(like pseudocode )\\
+\textbf{relevance to the class} This result shows that formal understanding of a language grammar and sub-categorization of categories, let us develop appropriate algorithms for dealing with syntax, as we discuss it in class.
 
 
+\subsection*{3. Three questions related to the paper}
+(1) Does it give us a better result, If we use the same parsing rules for lexicalazied PCFGs? \\
 
+(2) Is it possible that we reduce the number of rules from the model and get a better or at least same result?\\
+
+(3) Is it possible to make the similar model for other languages like french?\\
 
 
 

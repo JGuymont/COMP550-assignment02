@@ -104,7 +104,7 @@ class EM:
         A = self.update_A()
         B = self.update_B()
         return Pi, A, B
-
+  
 if __name__ == '__main__':
     Pi = add_one_smoothing(count_PI)
     A =  add_one_smoothing(count_A)
@@ -119,12 +119,8 @@ if __name__ == '__main__':
 
     em = EM(Pi, A, B, tags, lexicon, sentence2)
     Pi2, A2, B2 = em.update_parameters()
+    print(em.gamma)
 
     Pi = (Pi1 + Pi2) / 2
     A = (A1 + A2) / 2
     B = (B1 + B2) / 2
-    
-    print(sum(Pi))
-    print(np.sum(A, axis=1))
-    print(np.sum(B, axis=1))
-
